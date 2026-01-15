@@ -21,10 +21,10 @@ Route::middleware('auth:sanctum')->group(function(){
 
     //Event CRUD
     Route::prefix('events')->group(function(){
-        Route::get('/', [EventController::class],'index');
-        Route::get('/upcoming', [EventController::class],'upcoming');
-        Route::get('/past', [EventController::class],'past');
-        Route::get('/filter', [EventController::class],'filter');
+        Route::get('/', [EventController::class,'index']);
+        Route::get('/upcoming', [EventController::class,'upcoming']);
+        Route::get('/past', [EventController::class,'past']);
+        Route::get('/filter', [EventController::class,'filter']);
     
         //Event CRUD only Admin
         Route::post('/',[EventController::class,'store']);
