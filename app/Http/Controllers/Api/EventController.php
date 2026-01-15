@@ -11,9 +11,52 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+    function checkAdmin(Request $request){
+        return $request->user()->is_admin ?? false;
+    }
+
+    public function index(Request $request)
     {
-        //
+        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
+        $events = $query->get();
+        return response()->json($events);
+        
+    }
+
+    public function upcoming(Request $request)
+    {
+        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
+        $events = $query->where('date', '>', now())->get();
+        return response()->json($events);
+        
+    }
+
+    public function past(Request $request)
+    {
+        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
+        $events = $query->where('date', '<', now())->get();
+        return response()->json($events);
+        
+    }
+
+
+    //két dátum közé eső események lekérdezése
+    public function filter(Request $request)
+    {;
+
+        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
+
+        if($request->has('from')){
+            $query->where('date','>',$request->from);
+        }
+
+        if($request->has('to')){
+            $query->where('date','<',$request->to);
+        }
+
+        $events = $query->get();
+        return response()->json($events);
     }
 
     /**
