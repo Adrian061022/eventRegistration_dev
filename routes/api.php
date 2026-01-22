@@ -21,15 +21,15 @@ Route::middleware('auth:sanctum')->group(function(){
 
     //Event CRUD
     Route::prefix('events')->group(function(){
-        Route::get('/', [EventController::class],'index');
-        Route::get('/upcoming', [EventController::class],'upcoming');
-        Route::get('/past', [EventController::class],'past');
-        Route::get('/filter', [EventController::class],'filter');
+    Route::get('/', [EventController::class, 'index']);
+    Route::get('/upcoming', [EventController::class, 'upcoming']);
+    Route::get('/past', [EventController::class, 'past']);
+    Route::get('/filter', [EventController::class, 'filter']);
     
         //Event CRUD only Admin
-        Route::post('/',[EventController::class,'store']);
-        Route::put('/{id}',[EventController::class,'update']);
-        Route::delete('/{id}',[EventController::class,'destroy']);
+    Route::post('/', [EventController::class, 'store']);
+    Route::put('/{id}', [EventController::class, 'update']);
+    Route::delete('/{id}', [EventController::class, 'destroy']);
 
     // Registration
     Route::post('{event}/register', [RegistrationController::class, 'register']);
@@ -39,11 +39,11 @@ Route::middleware('auth:sanctum')->group(function(){
 
     
     Route::prefix('users')->group(function(){
-        Route::get('/', [UserController::class],'index');
-        Route::get('/{id}', [UserController::class],'show');
-        Route::post('/', [UserController::class],'store');
-        Route::put('/{id}', [UserController::class],'update');
-        Route::delete('/{id}',[UserController::class,'destroy']);
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/{id}', [UserController::class, 'show']);
+    Route::post('/', [UserController::class, 'store']);
+    Route::put('/{id}', [UserController::class, 'update']);
+    Route::delete('/{id}', [UserController::class, 'destroy']);
     });
 
 });

@@ -19,18 +19,31 @@ class EventController extends Controller
     /**
      * Listázás: user = saját események, admin = minden esemény
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if ($this->checkAdmin($request)) {
+            // Admin: return all events, include related users (pivot available on the relation)
+            $events = Event::with('users')->get();
+        } else {
+            // Regular user: return only their events with pivot data
+            $events = $request->user()->events()->withPivot('status', 'registered_at')->get();
+        }
+
+        return response()->json($events);
     }
+    
 
     /**
      * Jövőbeli események
      */
     public function upcoming(Request $request)
     {
-        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
-        $events = $query->where('date', '>=', now())->withPivot('status', 'registered_at')->get();
+        if ($this->checkAdmin($request)) {
+            $events = Event::where('date', '>=', now())->with('users')->get();
+        } else {
+            $events = $request->user()->events()->where('date', '>=', now())->withPivot('status', 'registered_at')->get();
+        }
+
         return response()->json($events);
     }
 
@@ -39,8 +52,12 @@ class EventController extends Controller
      */
     public function past(Request $request)
     {
-        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
-        $events = $query->where('date', '<', now())->withPivot('status', 'registered_at')->get();
+        if ($this->checkAdmin($request)) {
+            $events = Event::where('date', '<', now())->with('users')->get();
+        } else {
+            $events = $request->user()->events()->where('date', '<', now())->withPivot('status', 'registered_at')->get();
+        }
+
         return response()->json($events);
     }
 
@@ -50,7 +67,11 @@ class EventController extends Controller
      */
     public function filter(Request $request)
     {
-        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
+        if ($this->checkAdmin($request)) {
+            $query = Event::query();
+        } else {
+            $query = $request->user()->events();
+        }
 
         if ($request->has('status')) {
             $status = $request->status;
@@ -61,6 +82,12 @@ class EventController extends Controller
         }
         if ($request->has('to')) {
             $query->where('date', '<=', $request->to);
+        }
+
+        // For admin we eager-load users (pivot available via users relationship),
+        // for regular users the relation query already contains pivot columns.
+        if ($this->checkAdmin($request)) {
+            return response()->json($query->with('users')->get());
         }
 
         return response()->json($query->withPivot('status', 'registered_at')->get());
