@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Admin\EventController;
+
 
 class EventController extends Controller
 {
@@ -13,7 +13,8 @@ class EventController extends Controller
      */
     public function index()
     {
-        //
+        $events = Event::all();
+        return view('admin.events.index', compact('events'));
     }
 
     /**
@@ -21,7 +22,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.events.create');
     }
 
     /**
@@ -29,7 +30,14 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'date' => 'required|date',
+            'location' => 'nullable|string|max:255',
+            'max_attendees' => 'required|integer|min:1',
+        ]);
+        return redirect()->route('admin.events.index')->with('success', 'Esemény létrehozva sikeresen.');
     }
 
     /**
@@ -43,9 +51,9 @@ class EventController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Event $event)
     {
-        //
+        return view('admin.events.edit', compact('event'));
     }
 
     /**
@@ -53,14 +61,23 @@ class EventController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'date' => 'required|date',
+            'location' => 'nullable|string|max:255',
+            'max_attendees' => 'required|integer|min:1',
+        ]);
+        $event->update($request->all());
+        return redirect()->route('admin.events.index')->with('success', 'Esemény frissítve sikeresen.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event)
     {
-        //
+        $event->delete();
+        return redirect()->route('admin.events.index')->with('success', 'Esemény törölve sikeresen.');
     }
 }
