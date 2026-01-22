@@ -43,34 +43,38 @@ class AuthController extends Controller
         ], 201);
     }
 
+
     public function login(Request $request){
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+      
+            $validated = $request->validate([
+                'email'=> 'required|email',
+                'password'=>'required|string',
+            ]);    
+       
+        $user = User::where('email',$validated['email'])->first();
 
-        $user= User::where('email', $request->email)->first();
-
-        if(!$user || !Hash::check($request->password, $user->password)){
-            return response()->json(['message' =>'Invalid email or password'], 401);
+        if(!$user || !Hash::check($validated['password'], $user->password)){
+            return response()->json([
+                'message'=>'Invalid email or password'
+            ], 401);
         }
 
-        $token=$user->createToken('api-token')->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login successful',
-            'user' => [
+            'message'=>'Login successful',
+            'user'=> [
                 'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'phone' => $user->phone,
-                'is_admin' => $user->is_admin,
+                'name'=> $user->name,
+                'email'=> $user->email,
+                'phone'=>$user->phone,
+                'is_admin'=>$user->is_admin,
             ],
-            'access' => [
-                'token' => $token,
-                'token_type' => 'Bearer'
+            'access'=>[
+                'token'=>$token,
+                'token_type'=>'Bearer'
             ]
-        ]);
+        ], 200);
     }
 
     public function logout(Request $request){
@@ -78,7 +82,8 @@ class AuthController extends Controller
         if ($user){
             $user->currentAccessToken()->delete();
         }
-
-        return response()->json(['message' => 'Logout successful']);
+        return response()->json([
+            'message'=>'Logged out successfully'
+        ], 200);
     }
 }

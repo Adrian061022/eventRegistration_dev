@@ -19,11 +19,9 @@ class EventController extends Controller
     /**
      * Listázás: user = saját események, admin = minden esemény
      */
-    public function index(Request $request)
+    public function index()
     {
-        $query = $this->checkAdmin($request) ? Event::query() : $request->user()->events();
-        $events = $query->withPivot('status', 'registered_at')->get();
-        return response()->json($events);
+        //
     }
 
     /**

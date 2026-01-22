@@ -21,22 +21,22 @@ Route::middleware('auth:sanctum')->group(function(){
 
     //Event CRUD
     Route::prefix('events')->group(function(){
-        Route::get('/', [EventController::class,'index']);
-        Route::get('/upcoming', [EventController::class,'upcoming']);
-        Route::get('/past', [EventController::class,'past']);
-        Route::get('/filter', [EventController::class,'filter']);
+        Route::get('/', [EventController::class],'index');
+        Route::get('/upcoming', [EventController::class],'upcoming');
+        Route::get('/past', [EventController::class],'past');
+        Route::get('/filter', [EventController::class],'filter');
     
         //Event CRUD only Admin
         Route::post('/',[EventController::class,'store']);
         Route::put('/{id}',[EventController::class,'update']);
         Route::delete('/{id}',[EventController::class,'destroy']);
 
-        //Registration
-        Route::post('{event}/register', [RegistrationController::class,'register']); //user
-        Route::delete('{event}/unregister', [RegistrationController::class,'unregister']); //user
-        Route::delete('{event}/users/{user}', [RegistrationController::class,'adminRemoveUser']); //admin
+    // Registration
+    Route::post('{event}/register', [RegistrationController::class, 'register']);
+    Route::delete('{event}/unregister', [RegistrationController::class, 'unregister']);
+    Route::delete('{event}/users/{user}', [RegistrationController::class, 'adminRemoveUser']);
+});
 
-    });
     
     Route::prefix('users')->group(function(){
         Route::get('/', [UserController::class],'index');
